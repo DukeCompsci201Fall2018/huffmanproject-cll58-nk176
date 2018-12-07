@@ -82,10 +82,10 @@ out.writeBits(BITS_PER_WORD, val);
 		String code = codings[PSEUDO_EOF];
 		out.writeBits(code.length(), Integer.parseInt(code, 2));
 		while(true) {
-
-			if(in.readBits(BITS_PER_WORD) == -1)
+			int value = in.readBits(BITS_PER_WORD);
+			if(value == -1)
 				break;
-			code = codings[in.readBits(BITS_PER_WORD)];
+			code = codings[value];
 			out.writeBits(code.length(), Integer.parseInt(code, 2));
 		}
 	}
@@ -128,7 +128,7 @@ out.writeBits(BITS_PER_WORD, val);
 		while(pq.size() > 1) {
 			HuffNode left = pq.remove();
 			HuffNode right = pq.remove();
-			HuffNode t = new HuffNode(0, left.myWeight + right.myWeight, left, right);
+			HuffNode t = new HuffNode(left.myValue + right.myValue, left.myWeight + right.myWeight, left, right);
 			pq.add(t);
 		}
 
@@ -140,7 +140,8 @@ out.writeBits(BITS_PER_WORD, val);
 		int[] freq = new int[ALPH_SIZE + 1];
 		freq[PSEUDO_EOF] =1;
 		while (true){
-			if (in.readBits(BITS_PER_WORD) == -1) break;
+			int value = in.readBits(BITS_PER_WORD);
+			if (value == -1) break;
 			int add = in.readBits(BITS_PER_WORD);
 			freq[add] += 1;
 		}
@@ -196,9 +197,10 @@ out.writeBits(BITS_PER_WORD, val);
 	}
 
 	private HuffNode readTreeHeader(BitInputStream in) {
-		if(in.readBits(1) == -1)
-			throw new HuffException("");
-		if(in.readBits(1) == 0) {
+		int value = in.readBits(1) ;
+		if(value == -1)
+			throw new HuffException("no PSEUDO_EOF");
+		if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
 			return new HuffNode(0,0, left, right);
