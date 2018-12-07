@@ -139,8 +139,10 @@ public class HuffProcessor {
 			int value = in.readBits(BITS_PER_WORD);
 			if (value == -1) break;
 			if(value == PSEUDO_EOF) break;
+			else {
 			int add = in.readBits(BITS_PER_WORD);
 			freq[add] += 1;
+			}
 		}
 		return freq;
 	}
