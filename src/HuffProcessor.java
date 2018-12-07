@@ -43,11 +43,6 @@ public class HuffProcessor {
 	 */
 	public void compress(BitInputStream in, BitOutputStream out){
 
-		/*while (true){
-int val = in.readBits(BITS_PER_WORD);
-if (val == -1) break;
-out.writeBits(BITS_PER_WORD, val);
-}*/
 		int[] counts = readforCounts(in);
 		HuffNode root = makeTreeFromCounts(counts);
 		String[] codings = makeCodingsFromTree(root);
@@ -63,7 +58,7 @@ out.writeBits(BITS_PER_WORD, val);
 	private void writeHeader(HuffNode root, BitOutputStream out) {
 		// TODO Auto-generated method stub
 		HuffNode current = root;
-		if (root == null)
+		if (current == null)
 			return;
 		if(current.myLeft == null && current.myRight == null) {
 			out.writeBits(1,1);
