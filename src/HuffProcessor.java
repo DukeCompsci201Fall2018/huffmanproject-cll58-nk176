@@ -201,7 +201,8 @@ public class HuffProcessor {
 		if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
-			return new HuffNode(0,0, left, right);
+			HuffNode root =  new HuffNode(left.myValue + right.myValue, right.myWeight + left.myWeight, left, right);
+			return root;
 		}
 		else {
 			int val = in.readBits(BITS_PER_WORD + 1);
