@@ -198,8 +198,9 @@ out.writeBits(BITS_PER_WORD, val);
 
 	private HuffNode readTreeHeader(BitInputStream in) {
 		int value = in.readBits(1) ;
-		if(value == -1)
+		if(value == -1) {
 			throw new HuffException("no PSEUDO_EOF");
+		}
 		if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
