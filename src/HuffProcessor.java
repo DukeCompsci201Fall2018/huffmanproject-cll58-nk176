@@ -196,7 +196,7 @@ public class HuffProcessor {
 		if(value == -1) {
 			throw new HuffException("no PSEUDO_EOF");
 		}
-		if(value == 0) {
+		else if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
 			return new HuffNode(0,0, left, right);
