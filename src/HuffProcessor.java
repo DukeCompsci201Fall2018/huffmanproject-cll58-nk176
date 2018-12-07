@@ -97,16 +97,17 @@ public class HuffProcessor {
 
 	private void codingHelper(HuffNode root, String string, String[] encodings) {
 		// TODO Auto-generated method stub
-		if(root == null)
+		if(root == null) {
 			return;
+		}
 
 		if(root.myLeft == null && root.myRight == null) {
-			encodings[root.myValue] = string + "1";
+			encodings[root.myValue] = string;
 			return;
 		}
 
 		codingHelper(root.myLeft, string + "0", encodings);
-		codingHelper(root.myRight, string + "0", encodings);
+		codingHelper(root.myRight, string + "1", encodings);
 
 
 	}
@@ -126,8 +127,8 @@ public class HuffProcessor {
 			HuffNode t = new HuffNode(left.myValue + right.myValue, left.myWeight + right.myWeight, left, right);
 			pq.add(t);
 		}
-
-		return pq.remove();
+		HuffNode root = pq.remove();
+		return root;
 	}
 
 	private int[] readforCounts(BitInputStream in) {
@@ -137,6 +138,7 @@ public class HuffProcessor {
 		while (true){
 			int value = in.readBits(BITS_PER_WORD);
 			if (value == -1) break;
+			if(value == PSEUDO_EOF) break;
 			int add = in.readBits(BITS_PER_WORD);
 			freq[add] += 1;
 		}
@@ -196,13 +198,14 @@ public class HuffProcessor {
 		if(value == -1) {
 			throw new HuffException("no PSEUDO_EOF");
 		}
-		else if(value == 0) {
+		if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
 			return new HuffNode(0,0, left, right);
 		}
 		else {
-			return new HuffNode(in.readBits(BITS_PER_WORD + 1), 0, null, null);
+			int val = in.readBits(BITS_PER_WORD + 1);
+			return new HuffNode(val, 0, null, null);
 		}
 	}
 }
