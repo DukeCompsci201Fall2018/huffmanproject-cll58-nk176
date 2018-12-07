@@ -156,11 +156,11 @@ public class HuffProcessor {
 	 */
 	public void decompress(BitInputStream in, BitOutputStream out){
 
-		while (true){
-			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
-			out.writeBits(BITS_PER_WORD, val);
+		int bits = in.readBits(BITS_PER_INT);
+		if(bits!=HUFF_TREE) {
+			throw new HuffException("illegal header starts with "+ bits);
 		}
+		
 		HuffNode root = readTreeHeader(in);
 		readCompressedBits(root, in, out);
 		out.close();
@@ -196,12 +196,12 @@ public class HuffProcessor {
 	private HuffNode readTreeHeader(BitInputStream in) {
 		int value = in.readBits(1) ;
 		if(value == -1) {
-			throw new HuffException("no PSEUDO_EOF");
+			throw new HuffException("bad input, no PSEUDO_EOF");
 		}
 		if(value == 0) {
 			HuffNode left = readTreeHeader(in);
 			HuffNode right = readTreeHeader(in);
-			HuffNode root =  new HuffNode(left.myValue + right.myValue, right.myWeight + left.myWeight, left, right);
+			HuffNode root =  new HuffNode(0, 0, left, right); 
 			return root;
 		}
 		else {
