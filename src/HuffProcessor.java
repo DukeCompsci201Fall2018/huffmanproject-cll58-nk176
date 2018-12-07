@@ -44,10 +44,10 @@ public class HuffProcessor {
 	public void compress(BitInputStream in, BitOutputStream out){
 
 		/*while (true){
-	int val = in.readBits(BITS_PER_WORD);
-	if (val == -1) break;
-	out.writeBits(BITS_PER_WORD, val);
-	}*/
+int val = in.readBits(BITS_PER_WORD);
+if (val == -1) break;
+out.writeBits(BITS_PER_WORD, val);
+}*/
 		int[] counts = readforCounts(in);
 		HuffNode root = makeTreeFromCounts(counts);
 		String[] codings = makeCodingsFromTree(root);
@@ -63,12 +63,14 @@ public class HuffProcessor {
 	private void writeHeader(HuffNode root, BitOutputStream out) {
 		// TODO Auto-generated method stub
 		HuffNode current = root;
+		if (root == null)
+			return;
 		if(current.myLeft == null && current.myRight == null) {
-			out.write(1);
+			out.writeBits(1,1);
 			out.writeBits(BITS_PER_WORD + 1, current.myValue);
 		}
 		else {
-			out.write(0);
+			out.writeBits(1,0);
 			writeHeader(current.myLeft, out);
 			writeHeader(current.myRight, out);
 		}
@@ -77,15 +79,17 @@ public class HuffProcessor {
 
 	private void writeCompressedBits(String[] codings, BitInputStream in, BitOutputStream out) {
 		// TODO Auto-generated method stub
-
 		String code = codings[PSEUDO_EOF];
 		out.writeBits(code.length(), Integer.parseInt(code, 2));
+		while(true) {
 
-		for(int i = 0; i < codings.length; i++) {
-			code = codings[i];
+			if(in.readBits(BITS_PER_WORD) == -1)
+				break;
+			code = codings[in.readBits(BITS_PER_WORD)];
 			out.writeBits(code.length(), Integer.parseInt(code, 2));
 		}
 	}
+
 
 	private String[] makeCodingsFromTree(HuffNode root) {
 		// TODO Auto-generated method stub
@@ -102,12 +106,12 @@ public class HuffProcessor {
 			return;
 
 		if(root.myLeft == null && root.myRight == null) {
-			encodings[root.myValue] = encodings[root.myValue] + "1";
+			encodings[root.myValue] = string + "1";
 			return;
 		}
 
-		codingHelper(root.myLeft, encodings[root.myValue] + "0", encodings);
-		codingHelper(root.myRight, encodings[root.myValue] + "0", encodings);
+		codingHelper(root.myLeft, string + "0", encodings);
+		codingHelper(root.myRight, string + "0", encodings);
 
 
 	}
@@ -116,7 +120,7 @@ public class HuffProcessor {
 		// TODO Auto-generated method stub
 		PriorityQueue<HuffNode> pq = new PriorityQueue<>();
 		for(int i = 0; i < freq.length; i++) {
-			if(freq[i] <0) {
+			if(freq[i] >0) {
 				pq.add(new HuffNode(i, freq[i], null, null));
 			}
 		}
@@ -127,6 +131,7 @@ public class HuffProcessor {
 			HuffNode t = new HuffNode(0, left.myWeight + right.myWeight, left, right);
 			pq.add(t);
 		}
+
 		return pq.remove();
 	}
 
