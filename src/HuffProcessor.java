@@ -79,15 +79,15 @@ out.writeBits(BITS_PER_WORD, val);
 
 	private void writeCompressedBits(String[] codings, BitInputStream in, BitOutputStream out) {
 		// TODO Auto-generated method stub
-		String code = codings[PSEUDO_EOF];
-		out.writeBits(code.length(), Integer.parseInt(code, 2));
 		while(true) {
 			int value = in.readBits(BITS_PER_WORD);
 			if(value == -1)
 				break;
-			code = codings[value];
+			String code = codings[value];
 			out.writeBits(code.length(), Integer.parseInt(code, 2));
 		}
+		String code = codings[PSEUDO_EOF];
+		out.writeBits(code.length(), Integer.parseInt(code, 2));
 	}
 
 
